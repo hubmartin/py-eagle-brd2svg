@@ -1,5 +1,8 @@
 import svgwrite
 
+def draw_polygon(ctx, el):
+  return
+
 
 def wire(ctx, el):
   for e in el:
@@ -23,13 +26,12 @@ def smd(ctx, el):
     #center = 0, 0
     roundness_x = (float(e.get("roundness", "0")) / 100) * float(e.get("dx")) / 2
     roundness_y = (float(e.get("roundness", "0")) / 100) * float(e.get("dy")) / 2
- 
-    center = float(e.get("x")) - float(e.get("dx"))/2 , float(e.get("y"))-float(e.get("dy"))/2
+    smd_x = float(e.get('x'))
+    smd_y = float(e.get('y'))
+    center = -float(e.get("dx"))/2 , -float(e.get("dy"))/2 
     size = e.get("dx"), e.get("dy")
-    #print(e.get("rot"))
     rot = e.get("rot","R0")[1:]
-    #g = svgwrite.container.Group(transform='rotate('+str(rot)+') translate('+e.get("x")+','+e.get("y")+')')
-    g = svgwrite.container.Group(transform='rotate('+str(rot)+')')
+    g = svgwrite.container.Group(transform='translate(' + str(smd_x) + ',' + str(smd_y) + ') rotate('+str(rot)+')')
     g.add(dwg.rect(insert=center, size=size, rx=roundness_x, ry=roundness_y, fill='red'))
     ctx.add(g)
          
@@ -38,8 +40,10 @@ def package(ctx, el):
   for e in el:
     ws = e.findall("wire")
     wire(ctx, ws)
+    
     pads = e.findall("pad")
     pad(ctx, pads)
+      
     smds = e.findall("smd")
     smd(ctx, smds)
 
@@ -62,14 +66,14 @@ via(dwg, el)
 #elements
 el = tree.xpath("//elements/element")
 for e in el:
-  print (e.get("package"))
+  package_name = e.get("package")
   rot = e.get("rot", "R0")[1:]
-  print(rot)
   g = svgwrite.container.Group(transform='translate('+str(e.get('x'))+','+str(e.get('y'))+') rotate('+rot+')')
-  #g = svgwrite.container.Group()
+
   el = tree.xpath("//package[@name='"+e.get("package")+"']")
   package(g, el)
   dwg.add(g)
+    
 
 #board
 el = tree.xpath("//board/plain/wire")
