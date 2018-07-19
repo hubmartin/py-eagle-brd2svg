@@ -1,6 +1,20 @@
 import svgwrite
 
 def draw_polygon(ctx, el):
+
+  #choose start element
+  for e in el:
+    sx = e.get('x1')
+    sy = e.get('y1')
+    ex = e.get('x2')
+    ey = e.get('y2')
+    print( sx, sy, ex, ey)
+    for ee in el:
+      # skip parent line
+      if e != ee:
+        if (sx == ee.get('x1') and sy == ee.get('y1')) or (sx == ee.get('x2') and sy == ee.get('y2')):
+          print("corner match")
+    
   return
 
 
@@ -40,6 +54,8 @@ def package(ctx, el):
   for e in el:
     ws = e.findall("wire")
     wire(ctx, ws)
+    #if e.get('name') == "SPSGRF_R":
+    #  draw_polygon(ctx, ws)
     
     pads = e.findall("pad")
     pad(ctx, pads)
